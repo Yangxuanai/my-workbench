@@ -1,0 +1,97 @@
+{
+  "updatedAt": "2026-10-16 07:50",
+  "note": "每天替换这个文件即可，手机刷新后生效。给某条加上 \"soxl\": true 就会同时出现在首页和早报的「SOXL 相关」专区；标题或正文里出现 SOXL 也会被自动收进去。",
+  "groups": [
+    {
+      "key": "us",
+      "name": "美股财经",
+      "items": [
+        {
+          "title": "SOXL 盘前走强，费城半导体指数期货上涨",
+          "body": "三倍做多半导体 ETF 盘前跟随费半走强。SOXL 是三倍杠杆产品，日内波动约为半导体的 3 倍，注意仓位与止损。",
+          "source": "Reuters",
+          "time": "07:40",
+          "url": "https://www.jwview.com/jingwei/html/m/10-16/692870.shtml",
+          "soxl": true
+        },
+        {
+          "title": "存储板块盘前普跌，SK海力士跌超 2%、美光跌超 1%",
+          "body": "存储链是今天盘前最弱的一环，会直接拖累费半权重，进而压制 SOXL。开盘后留意存储是否止跌。",
+          "source": "中新经纬",
+          "time": "07:35",
+          "url": "https://www.jwview.com/jingwei/html/m/10-16/692870.shtml",
+          "soxl": true
+        },
+        {
+          "title": "英伟达财报临近，半导体板块波动率抬升",
+          "body": "龙头财报前后 SOXL 的隐含波动会明显放大，做 SOXL 时建议缩小单笔仓位，或改用更短周期。",
+          "source": "CNBC",
+          "time": "07:20",
+          "url": "https://finance.eastmoney.com/a/202610153897131347.html",
+          "soxl": true
+        },
+        {
+          "title": "大型科技股多数上涨，特斯拉盘前涨超 4%",
+          "body": "特斯拉与半导体无直接关系，但可作风险偏好参考。若纳指整体走强，SOXL 的顺势做多胜率会更高。",
+          "source": "新浪财经",
+          "time": "07:30",
+          "url": "https://cj.sina.com.cn/articles/view/1702925432/6580947801901c0fm"
+        },
+        {
+          "title": "今日美国经济数据：工业产出与产能利用率",
+          "body": "周期性数据，影响顺周期板块情绪。若数据大幅低于预期，指数可能走弱，SOXL 作为三倍杠杆会放大跌幅。",
+          "source": "FISCO",
+          "time": "待公布",
+          "url": "https://finance.yahoo.co.jp/news/detail/eb2f922baf063cadeb375551e0d404532e8114de"
+        }
+      ]
+    },
+    {
+      "key": "cn",
+      "name": "国内",
+      "items": [
+        {
+          "title": "A股再现批量回购，多家公司发布回购方案",
+          "body": "回购多出现在调整阶段，可留意后续跟进的规模与注销比例。",
+          "source": "经济参考报",
+          "time": "早间",
+          "url": "https://baijiahao.baidu.com/s?id=1879162644227000615"
+        },
+        {
+          "title": "锂业龙头前三季度净利同比暴增近 200 倍",
+          "body": "锂盐价格触底回升带来业绩弹性，关注同类资源股的业绩兑现。",
+          "source": "经济参考报",
+          "time": "早间",
+          "url": "https://baijiahao.baidu.com/s?id=1879162644227000615"
+        },
+        {
+          "title": "三部门联合调查车辆刹车踏板支架断裂问题",
+          "body": "涉及汽车零部件质量与召回，关注整车与供应链的短期情绪。",
+          "source": "经济参考报",
+          "time": "早间",
+          "url": "https://baijiahao.baidu.com/s?id=1879162644227000615"
+        },
+        {
+          "title": "央行行长潘功胜最新发声",
+          "body": "货币政策表态，通常影响利率预期与银行、地产板块。具体表述请点原文。",
+          "source": "证券之星",
+          "time": "早间",
+          "url": "https://4g.stockstar.com/detail/SS2026101600008595"
+        }
+      ]
+    },
+    {
+      "key": "other",
+      "name": "其他",
+      "items": [
+        {
+          "title": "欧元区贸易收支数据",
+          "body": "欧洲时段公布，对欧股与欧元有影响，间接影响美股风险偏好。",
+          "source": "FISCO",
+          "time": "欧洲时段",
+          "url": "https://finance.yahoo.co.jp/news/detail/eb2f922baf063cadeb375551e0d404532e8114de"
+        }
+      ]
+    }
+  ]
+}

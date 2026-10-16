@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
+<meta name="theme-color" content="#f7f9f8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="小羊的工作台" />
+<meta name="description" content="小羊的美股夜盘工作台：SOXL 专属关注、交易复盘、每日早报" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<title>小羊的工作台</title>
+<style>
+/* ============================================================
+   设计基调：简洁、留白、单一强调色、大数字小标签。
+   ============================================================ */
+:root{
+  --ink:#131c18;
+  --ink-2:#4d5a54;
+  --ink-3:#939e99;
+  --ink-4:#b8c2bd;
+  --line:#eef1ef;
+  --line-2:#e4e9e6;
+  --bg:#f7f9f8;
+  --card:#fff;
+  --accent:#1f6f52;
+  --accent-2:#2d8a66;
+  --accent-soft:#eef6f2;
+  --amber:#b8862b;
+  --amber-soft:#fdf6e8;
+  --blue:#3d6f9e;
+  --blue-soft:#eff5fa;
+  --red:#c0503f;
+  --red-soft:#fdf0ee;
+  --r:20px;
+  --r-sm:14px;
+  --shadow:0 1px 2px rgba(19,28,24,.03), 0 4px 16px rgba(19,28,24,.045);
+  --nav-h:58px;
+  --pad:20px;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:15px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+
+/* ---------- 布局 ---------- */
+#views{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 20px)}
+.view{display:none;padding:0 var(--pad)}
+.view.on{display:block}
+.wrap{max-width:540px;margin:0 auto}
+
+/* ---------- 页头 ---------- */
+.head{padding:calc(env(safe-area-inset-top) + 28px) 0 16px}
+.head .hi{font-size:13px;color:var(--ink-3);letter-spacing:.2px}
+.head h1{margin:3px 0 0;font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1.25}
+.head .sub{margin-top:7px;font-size:13px;color:var(--ink-3)}
+.hrow{display:flex;align-items:center;gap:12px}
+/* 上班/休息状态胶囊 */
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;
+  font-size:12px;font-weight:600;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.pill.off{background:#f2f5f3;color:var(--ink-3)}
+.pill i{width:6px;height:6px;border-radius:50%;background:currentColor;display:block}
+.pill.on i{animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ---------- 行情环境条 ---------- */
+.env{display:flex;align-items:stretch}
+.env-cell{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;
+  padding:2px 0;position:relative}
+.env-cell+.env-cell{padding-left:14px;margin-left:14px}
+.env-cell+.env-cell::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:1px;background:var(--line-2)}
+.env-cell .k{font-size:11px;color:var(--ink-3);white-space:nowrap}
+.env-cell .v{font-size:16px;font-weight:700;letter-spacing:-.3px;white-space:nowrap}
+.env-note{margin-top:12px;padding-top:11px;border-top:1px solid var(--line);
+  font-size:11.5px;color:var(--ink-3);line-height:1.65}
+.env-note b{color:var(--ink-2);font-weight:600}
+
+/* ---------- 打卡胶囊 ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:99px;
+  background:#f3f6f4;color:var(--ink-2);font-size:12.5px;cursor:pointer;transition:.15s;
+  border:1px solid transparent;white-space:nowrap}
+.chip.on{background:var(--accent-soft);color:var(--accent);border-color:#cfe4d9;font-weight:600}
+.chip:active{transform:scale(.95)}
+
+/* ---------- 小指标 ---------- */
+.mini{background:#f8faf9;border-radius:var(--r-sm);padding:11px 12px;text-align:center}
+.mini .k{font-size:11px;color:var(--ink-3)}
+.mini .v{font-size:18px;font-weight:700;letter-spacing:-.4px;margin-top:1px}
+.mini .v small{font-size:11px;font-weight:500;color:var(--ink-3);margin-left:1px}
+
+/* SOXL 页头大数字 */
+.sym{display:flex;align-items:baseline;gap:10px;margin-top:2px}
+.sym .code{font-size:32px;font-weight:800;letter-spacing:-1px;overflow-wrap:anywhere}
+.sym .name{font-size:13px;color:var(--ink-3)}
+
+/* 窄屏（小屏安卓 / iPhone SE）微调 */
+@media (max-width:360px){
+  :root{--pad:15px}
+  .head h1{font-size:23px}
+  .status .big{font-size:26px}
+  .status .big.has-days{font-size:20px}
+  .card{padding:16px}
+  .tile{padding:11px 12px}
+  .tile .v{font-size:17px}
+  nav button{font-size:9.5px}
+}
+
+/* ---------- 卡片 ---------- */
+.card{background:var(--card);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);margin-bottom:12px}
+.card.flush{padding:6px 18px}
+.card.tight{padding:15px 16px}
+.card-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-h:last-child{margin-bottom:0}
+.card-t{font-size:14px;font-weight:600;letter-spacing:.1px;display:flex;align-items:center;gap:7px}
+.card-t .pip{width:5px;height:5px;border-radius:50%;background:var(--accent-2);flex:0 0 auto}
+.more{font-size:12.5px;color:var(--ink-3)}
+.more.tap:active{opacity:.5}
+
+/* ---------- 状态条（替代原来的深色大卡）---------- */
+.status{display:flex;align-items:center;gap:14px}
+.status .left{flex:1;min-width:0}
+.status .tagline{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600}
+.status .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto;background:var(--accent-2)}
+.status .dot.live{animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.status .note{font-size:12.5px;color:var(--ink-3);margin-top:4px;overflow-wrap:anywhere}
+.status .right{text-align:right;flex:0 0 auto;min-width:0}
+.status .big{font-size:30px;font-weight:700;letter-spacing:-.8px;line-height:1.1;white-space:nowrap}
+/* 带「天」时（周末/长假空档）自动缩字号，避免撑破卡片 */
+.status .big.has-days{font-size:23px;letter-spacing:-.4px}
+.status .lab{font-size:11.5px;color:var(--ink-3);margin-top:3px}
+
+/* 时段进度条 */
+.track{height:4px;border-radius:99px;background:var(--line-2);overflow:hidden;margin-top:14px}
+.track>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .5s ease}
+.track-foot{display:flex;justify-content:space-between;margin-top:8px;font-size:11.5px;color:var(--ink-3)}
+
+/* ---------- 指标格 ---------- */
+.grid{display:grid;gap:10px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.tile{background:var(--card);border-radius:var(--r-sm);padding:13px 14px;box-shadow:var(--shadow)}
+.tile .k{font-size:11.5px;color:var(--ink-3)}
+.tile .v{font-size:19px;font-weight:700;letter-spacing:-.4px;margin-top:2px}
+.tile .v small{font-size:11.5px;font-weight:500;color:var(--ink-3);margin-left:2px}
+.tile .u{font-size:11px;color:var(--ink-3);margin-top:1px}
+
+/* ---------- 行 ---------- */
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.row .grow{flex:1;min-width:0}
+.row .t{font-size:14.5px;font-weight:500;line-height:1.45;overflow-wrap:anywhere}
+.row .d{font-size:12px;color:var(--ink-3);margin-top:2px;overflow-wrap:anywhere}
+.row.tap{cursor:pointer}
+.row.tap:active{opacity:.55}
+.tm{font-size:12px;color:var(--ink-3);flex:0 0 auto;font-variant-numeric:tabular-nums}
+.x{font-size:15px;color:var(--ink-4);padding:2px 6px;flex:0 0 auto}
+.x:active{color:var(--red)}
+
+/* 勾选 */
+.ck{width:21px;height:21px;border-radius:50%;border:1.5px solid var(--ink-4);flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;transition:.15s}
+.ck::after{content:'';width:9px;height:5px;border-left:1.8px solid #fff;border-bottom:1.8px solid #fff;
+    transform:rotate(-45deg) translateY(-1px);opacity:0;transition:.15s}
+.ck.on{background:var(--accent);border-color:var(--accent)}
+.ck.on::after{opacity:1}
+.ck:active{transform:scale(.9)}
+
+/* 标签 */
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;font-weight:500;line-height:1.75}
+.tag.g{background:var(--accent-soft);color:var(--accent)}
+.tag.a{background:var(--amber-soft);color:var(--amber)}
+.tag.b{background:var(--blue-soft);color:var(--blue)}
+.tag.r{background:var(--red-soft);color:var(--red)}
+.tag.n{background:#f2f5f3;color:var(--ink-3)}
+
+/* 数字涨跌 */
+.up{color:var(--accent)}
+.down{color:var(--red)}
+
+/* 进度条 */
+.bar{height:5px;border-radius:99px;background:var(--line-2);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:99px;background:var(--accent-2);transition:width .4s ease}
+
+/* 按钮 */
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;height:46px;border-radius:var(--r-sm);
+  font-size:15px;font-weight:600;border:none;cursor:pointer;font-family:inherit;width:100%;transition:.15s}
+.btn.pri{background:var(--accent);color:#fff}
+.btn.gho{background:var(--card);color:var(--accent);border:1.2px solid #d5e3db}
+.btn.sm{height:34px;font-size:13px;border-radius:11px;padding:0 14px;width:auto}
+.btn:active{opacity:.72}
+.btn-row{display:flex;gap:10px}
+.btn-row+.btn-row{margin-top:10px}
+
+/* 输入 */
+.inp{width:100%;height:48px;border-radius:var(--r-sm);border:1.2px solid var(--line-2);background:#fbfcfb;
+  padding:0 14px;font-size:16px;font-family:inherit;color:var(--ink);transition:.15s}
+.inp:focus{outline:none;border-color:#b3d0c2;background:#fff}
+textarea.inp{height:88px;padding:12px 14px;resize:none;line-height:1.6}
+.lab{font-size:12px;color:var(--ink-3);margin-bottom:6px;display:block}
+.field{margin-bottom:13px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+
+/* 分段 */
+.seg{display:flex;background:#f0f3f1;border-radius:var(--r-sm);padding:3px;margin-bottom:15px}
+.seg button{flex:1;border:none;background:transparent;font-family:inherit;font-size:14px;color:var(--ink-2);
+  padding:10px 0;border-radius:11px;cursor:pointer;font-weight:500;transition:.15s}
+.seg button.on{background:#fff;color:var(--accent);font-weight:600;box-shadow:0 1px 3px rgba(19,28,24,.07)}
+
+/* 计算结果 */
+.result{background:var(--accent-soft);border-radius:var(--r-sm);padding:16px;text-align:center;margin-bottom:12px}
+.result .k{font-size:12px;color:var(--ink-3)}
+.result .v{font-size:36px;font-weight:800;color:var(--accent);letter-spacing:-1.2px;line-height:1.15}
+.result .s{font-size:12px;color:var(--ink-3);margin-top:3px}
+.kv{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;font-size:13.5px;border-bottom:1px solid var(--line)}
+.kv:last-child{border-bottom:none}
+.kv .k{color:var(--ink-3)}
+.kv .v{font-weight:600;font-variant-numeric:tabular-nums}
+.warn{background:var(--amber-soft);color:#8a6516;font-size:13px;padding:13px 15px;border-radius:var(--r-sm);line-height:1.6}
+
+.empty{text-align:center;color:var(--ink-3);font-size:13px;padding:28px 12px;line-height:1.7}
+
+/* ---------- 时段轴 ---------- */
+.tl{display:flex;gap:12px;padding:11px 0}
+.tl .rail{width:3px;border-radius:99px;background:var(--line-2);flex:0 0 auto}
+.tl .rail.g{background:#57b98a}
+.tl .rail.a{background:#dfae5e}
+.tl .rail.b{background:#7aa6cc}
+.tl .body{flex:1;min-width:0}
+.tl .n{font-size:14px;font-weight:600}
+.tl .tm{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.tl .hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+
+/* ---------- 热力 ---------- */
+.heat{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.heat .c{aspect-ratio:1;border-radius:7px;background:#f1f4f2;display:flex;align-items:center;
+  justify-content:center;font-size:10px;font-weight:600;color:var(--ink-3)}
+.heat .c.l1{background:#e2f0e8}
+.heat .c.l2{background:#aedcc4;color:#2c6a4c}
+.heat .c.l3{background:#57b98a;color:#fff}
+.heat .c.l4{background:#1f6f52;color:#fff}
+.heat .c.now{outline:2px solid var(--amber);outline-offset:1px}
+.heat .c.tap:active{transform:scale(.92)}
+.heat-hd{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:5px}
+.heat-hd span{font-size:10px;color:var(--ink-3);text-align:center}
+.legend{display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:10px;font-size:11px;color:var(--ink-3)}
+.legend i{width:12px;height:12px;border-radius:4px;display:block}
+
+/* ---------- 电台 ---------- */
+.mi{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.mi:last-child{border-bottom:none}
+.mi:active{opacity:.6}
+.mi .cv{width:46px;height:46px;border-radius:13px;flex:0 0 auto;display:flex;align-items:center;
+  justify-content:center;font-size:20px;background:var(--accent-soft)}
+.mi.on .cv{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff}
+.mi .nm{font-size:14.5px;font-weight:600}
+.mi .ds{font-size:12px;color:var(--ink-3);margin-top:2px}
+.player{width:100%;height:330px;border:none;border-radius:var(--r-sm);background:#f4f7f5;display:block}
+.hint{font-size:12px;color:var(--ink-3);margin-top:10px;line-height:1.65}
+
+/* ---------- 新闻 ---------- */
+.tabs{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:0 0 auto;border:none;font-family:inherit;font-size:13.5px;font-weight:500;
+  padding:8px 16px;border-radius:99px;background:var(--card);color:var(--ink-2);
+  box-shadow:var(--shadow);cursor:pointer;transition:.15s}
+.tabs button.on{background:var(--accent);color:#fff}
+.ni{padding:14px 0;border-bottom:1px solid var(--line)}
+.ni:last-child{border-bottom:none}
+.ni .h{font-size:14.5px;font-weight:600;line-height:1.5;overflow-wrap:anywhere}
+.ni .b{font-size:13px;color:var(--ink-2);margin-top:6px;line-height:1.65;overflow-wrap:anywhere}
+.ni .m{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:8px;font-size:11.5px;color:var(--ink-3)}
+.ni a{color:var(--accent);text-decoration:none;font-weight:500}
+.ni.hot{background:var(--accent-soft);border-radius:var(--r-sm);padding:14px;margin:10px 0;border-bottom:none}
+.dotsep{width:3px;height:3px;border-radius:50%;background:var(--ink-4)}
+
+/* ---------- 底部导航 ---------- */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(255,255,255,.94);
+  backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);
+  border-top:1px solid var(--line-2);display:flex;padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
+nav .wrap{display:flex;width:100%;max-width:540px;margin:0 auto}
+nav button{flex:1;border:none;background:none;font-family:inherit;cursor:pointer;display:flex;
+  flex-direction:column;align-items:center;gap:3px;padding:5px 0;color:var(--ink-3);font-size:10.5px;transition:.15s}
+nav button .ico{font-size:19px;line-height:1;filter:grayscale(1);opacity:.45;transition:.15s}
+nav button.on{color:var(--accent);font-weight:600}
+nav button.on .ico{filter:none;opacity:1}
+
+/* ---------- 弹层 ---------- */
+.sheet-wrap{position:fixed;inset:0;z-index:80;display:none}
+.sheet-wrap.on{display:block}
+.sheet-bg{position:absolute;inset:0;background:rgba(19,28,24,.38);animation:fadein .2s}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:24px 24px 0 0;
+  padding:24px var(--pad) calc(24px + env(safe-area-inset-bottom));max-height:88vh;overflow-y:auto;
+  animation:up .26s cubic-bezier(.2,.8,.3,1);max-width:540px;margin:0 auto}
+@keyframes up{from{transform:translateY(26px);opacity:.5}to{transform:none;opacity:1}}
+.sheet h3{margin:0 0 18px;font-size:18px;font-weight:700;letter-spacing:-.3px}
+.sheet .sub{font-size:12.5px;color:var(--ink-3);margin:-12px 0 16px}
+
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 28px);transform:translateX(-50%) translateY(10px);
+  background:rgba(19,28,24,.92);color:#fff;font-size:13.5px;padding:11px 20px;border-radius:99px;z-index:99;
+  opacity:0;transition:.22s;pointer-events:none;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.foot{text-align:center;font-size:11.5px;color:var(--ink-4);padding:18px 0 8px;line-height:1.8}
+.sep{height:1px;background:var(--line);margin:14px 0}
+</style>
+</head>
+<body>
+
+<div id="views">
+
+  <!-- ================= 首页 ================= -->
+  <section class="view on" id="v-home">
+    <div class="wrap">
+
+      <!-- 页头：时间 + 上班/休息状态（不显示倒计时） -->
+      <div class="head">
+        <div class="hi" id="hi">小羊</div>
+        <div class="hrow">
+          <h1 id="bjBig">--:--</h1>
+          <span class="pill" id="workPill">—</span>
+        </div>
+        <div class="sub" id="bjDate">—</div>
+      </div>
+
+      <!-- 今日行情环境（时段 + 美东钟点，纯参照，无倒计时） -->
+      <div class="card tight">
+        <div class="env">
+          <div class="env-cell">
+            <div class="k">美股时段</div>
+            <div class="v" id="envSession">—</div>
+          </div>
+          <div class="env-cell">
+            <div class="k">美东时间</div>
+            <div class="v num" id="envEt">--:--</div>
+          </div>
+          <div class="env-cell">
+            <div class="k">你的时段</div>
+            <div class="v num" id="envWindow">--:--</div>
+          </div>
+        </div>
+        <div class="env-note" id="envNote">—</div>
+      </div>
+
+      <!-- 今日 SOXL -->
+      <div class="card" id="soxlCard">
+        <div class="card-h">
+          <div class="card-t"><span class="pip"></span>今日 <span id="symLabel">SOXL</span></div>
+          <div class="more" id="soxlCount">—</div>
+        </div>
+        <div id="soxlBody"></div>
+      </div>
+
+      <!-- 持仓（有持仓才显示） -->
+      <div class="card" id="soxlPosCard" style="display:none">
+        <div class="card-h">
+          <div class="card-t"><span class="pip"></span>持仓</div>
+          <div class="more tap" onclick="WB.go('trade')">去复盘 ›</div>
+        </div>
+        <div id="soxlPos"></div>
+      </div>
+
+      <!-- 今日要事 -->
+      <div class="card">
+        <div class="card-h">
+          <div class="card-t"><span class="pip"></span>今日要事</div>
+          <button class="btn gho sm" onclick="WB.openTodo()">＋ 添加</button>
+        </div>
+        <div id="todoList"></div>
+      </div>
+
+      <!-- 打卡 -->
+      <div class="card">
+        <div class="card-h">
+          <div class="card-t"><span class="pip"></span>今日打卡</div>
+          <div class="more" id="habitMore">—</div>
+        </div>
+        <div class="bar" style="margin-bottom:4px"><i id="habitBar" style="width:0%"></i></div>
+        <div class="chips" id="habitChips"></div>
+        <div class="grid g3" style="margin-top:14px">
+          <div class="mini"><div class="k">连续</div><div class="v num" id="mStreak">0<small>天</small></div></div>
+          <div class="mini"><div class="k">本周复盘</div><div class="v num" id="mWeekTrades">0<small>笔</small></div></div>
+          <div class="mini"><div class="k">本周盈亏</div><div class="v num" id="mWeekPnl">0</div></div>
+        </div>
+      </div>
+
+      <div class="foot">数据保存在本机浏览器<br>添加到主屏幕即可像 App 一样使用</div>
+    </div>
+  </section>
+
+  <!-- ================= 交易复盘 ================= -->
+  <section class="view" id="v-trade">
+    <div class="wrap">
+      <div class="head">
+        <div class="hi">交易</div>
+        <h1>SOXL 复盘</h1>
+        <div class="sub" id="tradeSub">—</div>
+      </div>
+
+      <!-- 复盘统计 -->
+      <div class="card">
+        <div class="card-h">
+          <div class="card-t"><span class="pip"></span>复盘统计</div>
+          <button class="btn gho sm" onclick="WB.openTrade()">＋ 记一笔</button>
+        </div>
+        <div id="reviewStats"></div>
+      </div>
+
+      <!-- 复盘记录 -->
+      <div class="card">
+        <div class="card-h">
+          <div class="card-t"><span class="pip"></span>复盘记录</div>
+          <div class="more" id="tradeCount">—</div>
+        </div>
+        <div id="tradeList"></div>
+      </div>
+
+      <!-- 仓位计算（放次位） -->
+      <div class="card">
+        <div class="card-h">
+          <div class="card-t"><span class="pip"></span>仓位计算</div>
+          <div class="more">给定股数，算投入与风险</div>
+        </div>
+        <div class="seg" id="dirSeg">
+          <button class="on" data-dir="long">做多</button>
+          <button data-dir="short">做空</button>
+        </div>
+        <div class="f2">
+          <div class="field"><label class="lab">进仓股数</label><input class="inp mono" id="cShares" type="number" inputmode="numeric" placeholder="例如 500" /></div>
+          <div class="field"><label class="lab">入场价</label><input class="inp mono" id="cEntry" type="number" inputmode="decimal" placeholder="0.00" /></div>
+        </div>
+        <div class="f2">
+          <div class="field"><label class="lab">止损价</label><input class="inp mono" id="cStop" type="number" inputmode="decimal" placeholder="0.00" /></div>
+        </div>
+        <div id="calcOut"></div>
+        <button class="btn gho" id="calcToTrade" style="margin-top:12px">把计划记入复盘</button>
+      </div>
+
+      <!-- 时段轴 -->
+      <div class="card">
+        <div class="card-h">
+          <div class="card-t"><span class="pip"></span>今日时段轴（美东）</div>
+          <div class="more" id="tlEtDate">—</div>
+        </div>
+        <div id="timeline"></div>
+        <div class="sep"></div>
+        <div style="font-size:12.5px;color:var(--ink-3);line-height:1.7" id="tlNote"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><div class="card-t"><span class="pip"></span>接下来休市</div></div>
+        <div id="holidays"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 电台 ================= -->
+  <section class="view" id="v-music">
+    <div class="wrap">
+      <div class="head">
+        <div class="hi">听点东西</div>
+        <h1>网易云电台</h1>
+        <div class="sub">选一张歌单，在下方直接播放</div>
+      </div>
+
+      <div class="card flush">
+        <div class="card-h" style="padding-top:14px">
+          <div class="card-t"><span class="pip"></span>歌单</div>
+          <div class="more" id="musicCount">—</div>
+        </div>
+        <div id="musicList"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+          <div class="card-t"><span class="pip"></span>播放器</div>
+          <div class="more" id="playerHint">—</div>
+        </div>
+        <div id="playerBox"></div>
+        <div class="hint">
+          如果白屏或提示「无法打开」，是网易云对站外嵌入的限制。
+          用下面的按钮复制链接，或直接跳网易云 App。
+        </div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn gho" onclick="WB.copyMusicLink()">复制链接</button>
+          <button class="btn gho" onclick="WB.openMusicApp()">网易云打开</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 早报 ================= -->
+  <section class="view" id="v-news">
+    <div class="wrap">
+      <div class="head">
+        <div class="hi">每日早报</div>
+        <h1>7:50 速览</h1>
+        <div class="sub" id="newsMeta">—</div>
+      </div>
+
+      <!-- SOXL 专属优先 -->
+      <div class="card">
+        <div class="card-h">
+          <div class="card-t"><span class="pip"></span>SOXL 相关</div>
+          <div class="more" id="soxlNewsCount">—</div>
+        </div>
+        <div id="soxlNewsList"></div>
+      </div>
+
+      <div class="tabs" id="newsSeg"></div>
+      <div class="card" id="newsCard"><div id="newsList"></div></div>
+
+      <div class="card">
+        <div class="card-h"><div class="card-t"><span class="pip"></span>说明</div></div>
+        <div class="hint">
+          内容来自 <code>news.json</code>，在电脑上改完手机刷新即生效。<br>
+          想让某条进「SOXL 相关」，给它加上 <code>"soxl": true</code> 即可。
+        </div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn gho" onclick="WB.loadNews(true)">重新加载</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 我的 ================= -->
+  <section class="view" id="v-me">
+    <div class="wrap">
+      <div class="head">
+        <div class="hi">设置</div>
+        <h1>我的</h1>
+        <div class="sub" id="meSub">—</div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><div class="card-t"><span class="pip"></span>称呼与目标</div></div>
+        <div class="field"><label class="lab">称呼</label><input class="inp" id="sName" placeholder="小羊" /></div>
+        <div class="field"><label class="lab">主要交易标的</label><input class="inp" id="sSymbol" placeholder="SOXL" /></div>
+        <div class="field"><label class="lab">英语目标</label><input class="inp" id="sEnglish" placeholder="CET-6 / IELTS 6.5" /></div>
+        <button class="btn pri" onclick="WB.saveSettings()">保存</button>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><div class="card-t"><span class="pip"></span>学习进度</div></div>
+        <div class="field"><label class="lab">正在读的书</label><input class="inp" id="sBook" placeholder="股票大作手回忆录" /></div>
+        <div class="f2">
+          <div class="field"><label class="lab">已读页数</label><input class="inp mono" id="sBookCur" type="number" inputmode="numeric" placeholder="0" /></div>
+          <div class="field"><label class="lab">总页数</label><input class="inp mono" id="sBookTotal" type="number" inputmode="numeric" placeholder="320" /></div>
+        </div>
+        <div class="field"><label class="lab">累计词汇量</label><input class="inp mono" id="sVocab" type="number" inputmode="numeric" placeholder="0" /></div>
+        <button class="btn pri" onclick="WB.saveSettings()">保存</button>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><div class="card-t"><span class="pip"></span>使用说明</div></div>
+        <div style="font-size:13.5px;color:var(--ink-2);line-height:1.9">
+          <b>1 · 钉到桌面</b><br>
+          手机浏览器打开链接 → 菜单 → 「添加到主屏幕」。之后就是一个独立图标。<br><br>
+          <b>2 · 数据在哪</b><br>
+          全部存在你这台手机的浏览器本地。换手机或清缓存会丢，用下面「导出备份」存一份。<br><br>
+          <b>3 · 怎么更新早报</b><br>
+          替换服务器上的 <span class="mono">news.json</span>，手机刷新即生效，不用改代码。
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><div class="card-t"><span class="pip"></span>数据</div></div>
+        <div class="btn-row">
+          <button class="btn gho" onclick="WB.exportData()">导出备份</button>
+          <button class="btn gho" onclick="WB.importData()">导入备份</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn gho" style="color:var(--red);border-color:#eccfc9" onclick="WB.clearAll()">清空全部数据</button>
+        </div>
+      </div>
+
+      <div class="foot" id="verFoot">—</div>
+    </div>
+  </section>
+
+</div>
+
+<nav>
+  <div class="wrap">
+    <button class="on" data-go="home"><span class="ico">🏠</span>工作台</button>
+    <button data-go="trade"><span class="ico">📈</span>复盘</button>
+    <button data-go="music"><span class="ico">🎧</span>电台</button>
+    <button data-go="news"><span class="ico">📰</span>早报</button>
+    <button data-go="me"><span class="ico">⚙️</span>我的</button>
+  </div>
+</nav>
+
+<div class="sheet-wrap" id="sheet">
+  <div class="sheet-bg" onclick="WB.closeSheet()"></div>
+  <div class="sheet" id="sheetBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/time.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

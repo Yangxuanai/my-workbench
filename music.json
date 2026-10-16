@@ -1,0 +1,50 @@
+{
+  "note": "neteaseId 填网易云歌单 ID（歌单链接 #/playlist?id= 后面那串数字）即可在页面内嵌播放；留空则走 url 外链。",
+  "playlists": [
+    {
+      "id": 0,
+      "name": "盯盘专注",
+      "icon": "📈",
+      "desc": "Lo-fi / 纯音乐，长时间盯盘不累不困",
+      "tag": "盯盘",
+      "neteaseId": "",
+      "url": "https://music.163.com/#/search/m/?s=Lo-fi%20%E4%B8%93%E6%B3%A8&type=1000"
+    },
+    {
+      "id": 1,
+      "name": "网球热身",
+      "icon": "🎾",
+      "desc": "开打前把身体叫醒的高能量歌单",
+      "tag": "运动",
+      "neteaseId": "",
+      "url": "https://music.163.com/#/search/m/?s=%E7%BD%91%E7%90%83%20%E7%83%AD%E8%BA%AB&type=1000"
+    },
+    {
+      "id": 2,
+      "name": "读书白噪音",
+      "icon": "📚",
+      "desc": "钢琴 / 环境音，配合 30 分钟阅读",
+      "tag": "读书",
+      "neteaseId": "",
+      "url": "https://music.163.com/#/search/m/?s=%E9%92%A2%E7%90%B4%20%E7%99%BD%E5%99%AA%E9%9F%B3&type=1000"
+    },
+    {
+      "id": 3,
+      "name": "复盘 BGM",
+      "icon": "📓",
+      "desc": "收盘复盘时听的克制节拍",
+      "tag": "复盘",
+      "neteaseId": "",
+      "url": "https://music.163.com/#/search/m/?s=%E5%A4%8D%E7%9B%98%20Lo-fi&type=1000"
+    },
+    {
+      "id": 4,
+      "name": "英语听力",
+      "icon": "🔤",
+      "desc": "BBC / TED 精听，配合影子跟读",
+      "tag": "英语",
+      "neteaseId": "",
+      "url": "https://music.163.com/#/search/m/?s=BBC%20%E8%8B%B1%E8%AF%AD%E5%90%AC%E5%8A%9B&type=1000"
+    }
+  ]
+}
